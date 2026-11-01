@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 184" width="440" height="184" font-family="Inter,'Segoe UI',-apple-system,Helvetica,Arial,sans-serif">
+<rect x=".75" y=".75" width="438.5" height="182.5" rx="10" fill="#14110d" stroke="#ff7a1a" stroke-opacity=".55" stroke-width="1.5"/>
+<rect x="10" y="16" width="4" height="152" rx="2" fill="#ff7a1a"/>
+<rect x="34" y="18" width="32" height="17" rx="3" fill="#ff7a1a"/>
+<text x="50" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10" font-weight="700" fill="#14110d" text-anchor="middle">P02</text>
+<text x="76" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10.5" fill="#8f877c">clarinhelp</text>
+<text x="414" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10" fill="#8f877c" text-anchor="end" letter-spacing="1">TYPESCRIPT ★ 0</text>
+<text x="34" y="62" font-size="18" font-weight="700" fill="#f5efe6">ClarinHelp</text>
+<text x="34" y="86" font-size="12.5" fill="#b8ad9e">Real-time tuner for beginner clarinettists in the browser,</text><text x="34" y="104" font-size="12.5" fill="#b8ad9e">with YIN pitch detection implemented from scratch in an</text><text x="34" y="122" font-size="12.5" fill="#b8ad9e">AudioWorklet.</text>
+<rect x="34" y="146" width="130" height="20" rx="3" fill="#ff7a1a" fill-opacity=".08" stroke="#ff7a1a" stroke-opacity=".7"/><text x="99.0" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff7a1a" text-anchor="middle" letter-spacing=".5">SIGNAL PROCESSING</text><rect x="172" y="146" width="77" height="20" rx="3" fill="#ff7a1a" fill-opacity=".08" stroke="#ff7a1a" stroke-opacity=".7"/><text x="210.5" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff7a1a" text-anchor="middle" letter-spacing=".5">WEB AUDIO</text><rect x="257" y="146" width="84" height="20" rx="3" fill="#ff7a1a" fill-opacity=".08" stroke="#ff7a1a" stroke-opacity=".7"/><text x="299.0" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff7a1a" text-anchor="middle" letter-spacing=".5">TYPESCRIPT</text>
+</svg>

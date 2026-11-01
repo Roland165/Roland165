@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 184" width="440" height="184" font-family="Inter,'Segoe UI',-apple-system,Helvetica,Arial,sans-serif">
+<rect x=".75" y=".75" width="438.5" height="182.5" rx="10" fill="#14110d" stroke="#ff4d4d" stroke-opacity=".55" stroke-width="1.5"/>
+<rect x="10" y="16" width="4" height="152" rx="2" fill="#ff4d4d"/>
+<rect x="34" y="18" width="32" height="17" rx="3" fill="#ff4d4d"/>
+<text x="50" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10" font-weight="700" fill="#14110d" text-anchor="middle">P03</text>
+<text x="76" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10.5" fill="#8f877c">long-term-diseases-dashboard</text>
+<text x="414" y="30" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="10" fill="#8f877c" text-anchor="end" letter-spacing="1">PYTHON ★ 0</text>
+<text x="34" y="62" font-size="18" font-weight="700" fill="#f5efe6">Long-term Diseases Dashboard</text>
+<text x="34" y="86" font-size="12.5" fill="#b8ad9e">Interactive dashboard to explore long-term disease data</text><text x="34" y="104" font-size="12.5" fill="#b8ad9e">with Plotly charts, built with Pandas and deployed live on</text><text x="34" y="122" font-size="12.5" fill="#b8ad9e">Streamlit Cloud.</text>
+<rect x="34" y="146" width="64" height="20" rx="3" fill="#ff4d4d" fill-opacity=".08" stroke="#ff4d4d" stroke-opacity=".7"/><text x="66.0" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff4d4d" text-anchor="middle" letter-spacing=".5">DATAVIZ</text><rect x="106" y="146" width="77" height="20" rx="3" fill="#ff4d4d" fill-opacity=".08" stroke="#ff4d4d" stroke-opacity=".7"/><text x="144.5" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff4d4d" text-anchor="middle" letter-spacing=".5">STREAMLIT</text><rect x="191" y="146" width="58" height="20" rx="3" fill="#ff4d4d" fill-opacity=".08" stroke="#ff4d4d" stroke-opacity=".7"/><text x="220.0" y="159.5" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace" font-size="9.5" font-weight="700" fill="#ff4d4d" text-anchor="middle" letter-spacing=".5">PLOTLY</text>
+</svg>
