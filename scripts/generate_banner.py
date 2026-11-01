@@ -7,6 +7,7 @@ does this daily). Without a token, the FALLBACK values below are used.
 import json
 import math
 import os
+import re
 import urllib.request
 from pathlib import Path
 
@@ -55,6 +56,7 @@ def _get(url, token, data=None):
 
 def fetch_stats():
     stats = dict(FALLBACK)
+    stats["contributions"] = scrape_contributions()
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         return stats
@@ -74,11 +76,30 @@ def fetch_stats():
     try:
         q = {"query": "query($l:String!){user(login:$l){contributionsCollection{contributionCalendar{totalContributions}}}}",
              "variables": {"l": USER}}
-        d = _get("https://api.github.com/graphql", token, json.dumps(q).encode())
-        stats["contributions"] = d["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+        if stats["contributions"] is None:
+            d = _get("https://api.github.com/graphql", token, json.dumps(q).encode())
+            stats["contributions"] = d["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
     except Exception as e:
         print("GraphQL error:", e)
     return stats
+
+
+def scrape_contributions():
+    """Read 'N contributions in the last year' from the public profile calendar (no token needed)."""
+    try:
+        req = urllib.request.Request(f"https://github.com/users/{USER}/contributions",
+                                     headers={"User-Agent": "Mozilla/5.0 banner-bot"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            html = r.read().decode("utf-8", "ignore")
+        m = re.search(r"([\d,]+)\s+contributions?\s+in\s+the\s+last\s+year", html)
+        if m:
+            return int(m.group(1).replace(",", ""))
+        days = re.findall(r'(\d+) contributions? on ', html)
+        if days:
+            return sum(int(d) for d in days)
+    except Exception as e:
+        print("Scrape error:", e)
+    return None
 
 
 def skill_pills(x0, y0, max_w):
