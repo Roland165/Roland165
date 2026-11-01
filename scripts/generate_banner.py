@@ -87,16 +87,23 @@ def fetch_stats():
 def scrape_contributions():
     """Read 'N contributions in the last year' from the public profile calendar (no token needed)."""
     try:
-        req = urllib.request.Request(f"https://github.com/users/{USER}/contributions",
-                                     headers={"User-Agent": "Mozilla/5.0 banner-bot"})
+        req = urllib.request.Request(
+            f"https://github.com/users/{USER}/contributions",
+            headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) banner-bot",
+                     "Accept": "text/html", "X-Requested-With": "XMLHttpRequest"})
         with urllib.request.urlopen(req, timeout=20) as r:
             html = r.read().decode("utf-8", "ignore")
-        m = re.search(r"([\d,]+)\s+contributions?\s+in\s+the\s+last\s+year", html)
+        text = re.sub(r"<[^>]+>", " ", html)
+        text = re.sub(r"\s+", " ", text)
+        m = re.search(r"([\d,]+|No) contributions? in the last year", text, re.I)
         if m:
-            return int(m.group(1).replace(",", ""))
-        days = re.findall(r'(\d+) contributions? on ', html)
+            print("Scrape found:", m.group(0))
+            return 0 if m.group(1).lower() == "no" else int(m.group(1).replace(",", ""))
+        days = re.findall(r"(\d+) contributions? on ", text)
         if days:
+            print("Scrape summed", len(days), "days")
             return sum(int(d) for d in days)
+        print("Scrape: pattern not found. Page excerpt:", text[:600])
     except Exception as e:
         print("Scrape error:", e)
     return None
