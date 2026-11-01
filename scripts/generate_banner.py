@@ -33,7 +33,43 @@ SKILLS = [
 
 SCORE = [("Roland", [6, 5], "40"), ("LLM hallucinations", [2, 3], "15")]
 
-FALLBACK = {"repos": 7, "contributions": None, "stars": 0, "top_lang": "Python"}
+FALLBACK = {"repos": 8, "contributions": None, "stars": 0, "top_lang": "Python", "repo_info": {}}
+
+# Animated line under the banner
+HEADLINE = "RAG · Agents · Deep Learning"
+
+# Project cards (one SVG per project in cards/). Add or remove entries freely.
+PROJECTS = [
+    {
+        "repo": "Azure-Chatbot-Template",
+        "title": "Azure Chatbot Template",
+        "desc": "Chat with your own documents: a RAG pipeline on Azure OpenAI (GPT-4o) with FAISS vector search, a FastAPI backend and a Streamlit UI.",
+        "tags": ["RAG", "AZURE OPENAI", "FASTAPI"],
+        "lang": "Python",
+    },
+    {
+        "repo": "ClarinHelp",
+        "title": "ClarinHelp",
+        "desc": "Real-time tuner for beginner clarinettists in the browser, with YIN pitch detection implemented from scratch in an AudioWorklet.",
+        "tags": ["SIGNAL PROCESSING", "WEB AUDIO", "TYPESCRIPT"],
+        "lang": "TypeScript",
+    },
+    {
+        "repo": "Long-term-diseases-Dashboard",
+        "title": "Long-term Diseases Dashboard",
+        "desc": "Interactive dashboard to explore long-term disease data with Plotly charts, built with Pandas and deployed live on Streamlit Cloud.",
+        "tags": ["DATAVIZ", "STREAMLIT", "PLOTLY"],
+        "lang": "Python",
+    },
+    {
+        "repo": "LS-CUSTOMS",
+        "title": "LS Customs",
+        "desc": "Full-stack sports car configurator: pick a brand, model, extras and store. Vue.js front, Node/Express API, MySQL, auth and admin panel.",
+        "tags": ["FULL-STACK", "VUE.JS", "MYSQL"],
+        "lang": "JavaScript",
+    },
+]
+CARD_COLORS = ["#ffb000", "#ff7a1a", "#ff4d4d", "#e0c08a", "#c084fc", "#38bdf8"]
 # --------------------------------------------
 
 AMBER = "#ffb000"
@@ -64,6 +100,7 @@ def fetch_stats():
         repos = _get(f"https://api.github.com/users/{USER}/repos?per_page=100&type=owner", token)
         owned = [r for r in repos if not r.get("fork")]
         stats["repos"] = len(repos)
+        stats["repo_info"] = {r["name"].lower(): r for r in repos}
         stats["stars"] = sum(r.get("stargazers_count", 0) for r in owned)
         langs = {}
         for r in owned:
@@ -254,7 +291,72 @@ def build_svg(s):
 '''
 
 
+MONO = "'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace"
+
+
+def build_headline():
+    """Monospace line that types itself, then a blinking cursor."""
+    n = len(HEADLINE)
+    size = 24
+    cw = size * 0.6  # approx. monospace advance
+    w = n * cw
+    x0 = 450 - w / 2
+    steps = [f"{i * cw:.1f}" for i in range(n + 1)]
+    xs = [f"{x0 + i * cw:.1f}" for i in range(n + 1)]
+    kt = ";".join(f"{i / n:.4f}" for i in range(n + 1))
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 56" width="900" height="56">
+<defs><clipPath id="c"><rect x="{x0:.1f}" y="0" width="0" height="56">
+  <animate attributeName="width" values="{';'.join(steps)}" keyTimes="{kt}" calcMode="discrete" dur="1.8s" begin="0.3s" fill="freeze"/>
+</rect></clipPath></defs>
+<text x="{x0:.1f}" y="36" font-family="{MONO}" font-size="{size}" font-weight="700" fill="{AMBER}" clip-path="url(#c)" textLength="{w:.1f}">{HEADLINE}</text>
+<rect x="{x0:.1f}" y="15" width="3" height="27" fill="{AMBER}">
+  <animate attributeName="x" values="{';'.join(xs)}" keyTimes="{kt}" calcMode="discrete" dur="1.8s" begin="0.3s" fill="freeze"/>
+  <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+</rect>
+</svg>
+'''
+
+
+def _wrap(text, width):
+    import textwrap
+    return textwrap.wrap(text, width)
+
+
+def build_card(i, p, info):
+    c = CARD_COLORS[i % len(CARD_COLORS)]
+    lang = (info.get("language") or p.get("lang") or "").upper()
+    stars = info.get("stargazers_count", 0)
+    lines = _wrap(p["desc"], 58)[:3]
+    desc = "".join(f'<text x="34" y="{86 + k * 18}" font-size="12.5" fill="#b8ad9e">{l}</text>' for k, l in enumerate(lines))
+    tags, x = "", 34
+    for t in p["tags"]:
+        w = round(len(t) * 6.6 + 18)
+        tags += (f'<rect x="{x}" y="146" width="{w}" height="20" rx="3" fill="{c}" fill-opacity=".08" stroke="{c}" stroke-opacity=".7"/>'
+                 f'<text x="{x + w/2}" y="159.5" font-family="{MONO}" font-size="9.5" font-weight="700" fill="{c}" text-anchor="middle" letter-spacing=".5">{t}</text>')
+        x += w + 8
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 184" width="440" height="184" font-family="{SANS}">
+<rect x=".75" y=".75" width="438.5" height="182.5" rx="10" fill="#14110d" stroke="{c}" stroke-opacity=".55" stroke-width="1.5"/>
+<rect x="10" y="16" width="4" height="152" rx="2" fill="{c}"/>
+<rect x="34" y="18" width="32" height="17" rx="3" fill="{c}"/>
+<text x="50" y="30" font-family="{MONO}" font-size="10" font-weight="700" fill="#14110d" text-anchor="middle">P{i+1:02d}</text>
+<text x="76" y="30" font-family="{MONO}" font-size="10.5" fill="{MUTED}">{p["repo"].lower()}</text>
+<text x="414" y="30" font-family="{MONO}" font-size="10" fill="{MUTED}" text-anchor="end" letter-spacing="1">{lang} ★ {stars}</text>
+<text x="34" y="62" font-size="18" font-weight="700" fill="{TEXT}">{p["title"]}</text>
+{desc}
+{tags}
+</svg>
+'''
+
+
 if __name__ == "__main__":
     stats = fetch_stats()
+    root = OUT.parent
     OUT.write_text(build_svg(stats), encoding="utf-8")
+    (root / "tagline.svg").write_text(build_headline(), encoding="utf-8")
+    cards = root / "cards"
+    cards.mkdir(exist_ok=True)
+    for i, p in enumerate(PROJECTS):
+        info = stats["repo_info"].get(p["repo"].lower(), {})
+        (cards / f"{p['repo'].lower()}.svg").write_text(build_card(i, p, info), encoding="utf-8")
+    stats.pop("repo_info", None)
     print("Wrote", OUT, stats)
