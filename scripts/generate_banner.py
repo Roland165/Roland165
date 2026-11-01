@@ -92,8 +92,14 @@ def _get(url, token, data=None):
 
 def fetch_stats():
     stats = dict(FALLBACK)
-    stats["contributions"] = scrape_contributions()
     token = os.environ.get("GITHUB_TOKEN")
+    start_year = None
+    if token:
+        try:
+            start_year = int(_get(f"https://api.github.com/users/{USER}", token)["created_at"][:4])
+        except Exception as e:
+            print("User error:", e)
+    stats["contributions"] = scrape_contributions(start_year)
     if not token:
         return stats
     try:
@@ -110,39 +116,46 @@ def fetch_stats():
             stats["top_lang"] = max(langs, key=langs.get)
     except Exception as e:  # keep fallback values
         print("REST error:", e)
-    try:
-        q = {"query": "query($l:String!){user(login:$l){contributionsCollection{contributionCalendar{totalContributions}}}}",
-             "variables": {"l": USER}}
-        if stats["contributions"] is None:
-            d = _get("https://api.github.com/graphql", token, json.dumps(q).encode())
-            stats["contributions"] = d["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
-    except Exception as e:
-        print("GraphQL error:", e)
     return stats
 
 
-def scrape_contributions():
-    """Read 'N contributions in the last year' from the public profile calendar (no token needed)."""
-    try:
-        req = urllib.request.Request(
-            f"https://github.com/users/{USER}/contributions",
-            headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) banner-bot",
-                     "Accept": "text/html", "X-Requested-With": "XMLHttpRequest"})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            html = r.read().decode("utf-8", "ignore")
-        text = re.sub(r"<[^>]+>", " ", html)
-        text = re.sub(r"\s+", " ", text)
-        m = re.search(r"([\d,]+|No) contributions? in the last year", text, re.I)
-        if m:
-            print("Scrape found:", m.group(0))
-            return 0 if m.group(1).lower() == "no" else int(m.group(1).replace(",", ""))
-        days = re.findall(r"(\d+) contributions? on ", text)
-        if days:
-            print("Scrape summed", len(days), "days")
-            return sum(int(d) for d in days)
-        print("Scrape: pattern not found. Page excerpt:", text[:600])
-    except Exception as e:
-        print("Scrape error:", e)
+def _scrape(url):
+    """Return the contribution count shown on a public calendar page, or None."""
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) banner-bot",
+                      "Accept": "text/html", "X-Requested-With": "XMLHttpRequest"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        html = r.read().decode("utf-8", "ignore")
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+    m = re.search(r"([\d,]+|No) contributions? in (?:the last year|\d{4})", text, re.I)
+    if m:
+        return 0 if m.group(1).lower() == "no" else int(m.group(1).replace(",", ""))
+    days = re.findall(r"(\d+) contributions? on ", text)
+    if days:
+        return sum(int(d) for d in days)
+    print("Scrape: pattern not found on", url, "excerpt:", text[:300])
+    return None
+
+
+def scrape_contributions(start_year=None):
+    """All-time contributions: sum of each calendar year since the account was created."""
+    import datetime
+    now = datetime.date.today().year
+    start_year = start_year or now - 8
+    total, found = 0, False
+    for y in range(start_year, now + 1):
+        try:
+            n = _scrape(f"https://github.com/users/{USER}/contributions?from={y}-01-01&to={y}-12-31")
+        except Exception as e:
+            print("Scrape error", y, e)
+            n = None
+        if n is not None:
+            print(f"  {y}: {n} contributions")
+            total += n
+            found = True
+    if found:
+        print("Scrape found (all time):", total)
+        return total
     return None
 
 
@@ -164,7 +177,7 @@ def skill_pills(x0, y0, max_w):
 
 def build_svg(s):
     contrib = "–" if s["contributions"] is None else f"{s['contributions']:,}"
-    kpis = [(contrib, "contributions / yr"), (str(s["repos"]), "public repos"), (s["top_lang"], "top language")]
+    kpis = [(contrib, "contributions"), (str(s["repos"]), "public repos"), (s["top_lang"], "top language")]
     kpi_svg = ""
     for i, (val, lab) in enumerate(kpis):
         x = 40 + i * 130
